@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width,initial-scale=1" charset="utf-8">
+<head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<section id = "animation">
+    <div class = "ani_heartbeat">
+<!--        <div class="back">-->
+            <div class="heart"></div>
+<!--        </div>-->
+    </div>
+    <div class="ani_heart">
+        <div class="wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path id = "heart" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <script>
+                function toggle(e){
+                    const target = e.target;
+                    if(target.classList.contains('like')){
+                        target.classList.add('unlike');
+                        target.classList.remove('like');
+                    }else{
+                        target.classList.add('like');
+                        target.classList.remove('unlike');
+                    }
+                }
+                document.querySelectorAll('#heart')[0].addEventListener('click', toggle);
+            </script>
+        </div>
+    </div>
+    <div class="ani_cube">
+        <div class="cube_wrapper">
+            <div class="front">front</div>
+            <div class="back">back</div>
+            <div class="left">left</div>
+            <div class="right">right</div>
+            <div class="bottom">bottom</div>
+            <div class="top">top</div>
+        </div>
+    </div>
+    <div class="ani_cube2">
+        <div class="cube_wrapper">
+            <div class="front">front</div>
+            <div class="back">back</div>
+            <div class="left">left</div>
+            <div class="right">right</div>
+            <div class="bottom">bottom</div>
+            <div class="top">top</div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
