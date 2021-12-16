@@ -8,32 +8,222 @@
     --color6: #FF7F50;
     --color7: #FFBF00;
 }
+header{
+    grid-area: head;
+}
+#navigator ul li{
+    grid-area: li;
+}
+#font{
+    grid-area: font;
+}
+#me{
+    grid-area: me;
+}
+#awards{
+    grid-area:awards;
+}
+#animation .ani_heartbeat{
+    grid-area : ani_heartbeat;
+}
+#animation .ani_heart{
+    grid-area : ani_heart;
+}
+#animation .ani_cube{
+    grid-area : ani_cube;
+}
+#animation .ani_cube2{
+    grid-area : ani_cube2;
+}
+#animation .ani_load{
+    grid-area : ani_load;
+}
+
+@media all and (max-width: 641px) {
+    .ani_cube, .ani_cube2, .ani_heartbeat,
+    .ani_heart, .ani_load, #awards, #me, #font, #animation,
+    li, header{float:left; width: 100%; flex-direction: column-reverse;}
+}
+.ani_cube, .ani_cube2, .ani_heartbeat,
+.ani_heart, .ani_load{
+    display : flex;
+}
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Chewy', 'Noto Sans KR';
 }
-#animation{
-    display: grid;
-}
-
-section{
-    min-height: 100vh;
-    width: 100%;
-    /*flex: 0;*/
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+html, body{
+    margin : 0;
+    padding : 0;
     background-color: #f2f9fd;
 }
-
+section{
+    display: flex;
+    justify-content: center;
+}
+#animation h2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width:100%;
+}
+#me_awards{
+    width: 100%;
+}
+#font{
+    width: 100%;
+}
+#font .wrapper {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+#font svg {
+    animation: fill 0.5s linear forwards 3.4s;
+}
+@keyframes fill {
+    from {
+        fill: transparent;
+    }
+    to {
+        fill: var(--color2);
+    }
+}
+#font svg path {
+    stroke: var(--color2);
+    stroke-width: 5;
+    animation: stroke 1s linear forwards;
+}
+@keyframes stroke {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+#font svg path:nth-child(1) {
+    stroke-dasharray: 605px;
+    stroke-dashoffset: 605px;
+}
+#font svg path:nth-child(2) {
+    stroke-dasharray: 605px;
+    stroke-dashoffset: 605px;
+    /*stroke-dasharray: 555px;*/
+    /*stroke-dashoffset: 555px;*/
+    /*animation-delay: 0.3s;*/
+}
+#font svg path:nth-child(3) {
+    stroke-dasharray: 387px;
+    stroke-dashoffset: 387px;
+    animation-delay: 1.6s;
+}
+#font svg path:nth-child(4) {
+    stroke-dasharray: 555px;
+    stroke-dashoffset: 555px;
+    animation-delay: 1.9s;
+}
+#font svg path:nth-child(5) {
+    stroke-dasharray: 261px;
+    stroke-dashoffset: 261px;
+    animation-delay: 1.2s;
+}
+#font svg path:nth-child(6) {
+    stroke-dasharray: 489px;
+    stroke-dashoffset: 489px;
+    animation-delay: 1.5s;
+}
+#font svg path:nth-child(7) {
+    stroke-dasharray: 631px;
+    stroke-dashoffset: 631px;
+    animation-delay: 1.8s;
+}
+#font svg path:nth-child(8) {
+    /*stroke-dasharray: 535px;*/
+    /*stroke-dashoffset: 535px;*/
+    /*animation-delay: 2.1s;*/
+    stroke-dasharray: 605px;
+    stroke-dashoffset: 605px;
+}
+#font svg path:nth-child(9) {
+    stroke-dasharray: 267px;
+    stroke-dashoffset: 267px;
+    animation-delay: 2.4s;
+}
+#font svg path:nth-child(10) {
+    stroke-dasharray: 631px;
+    stroke-dashoffset: 631px;
+    animation-delay: 1.8s;
+}
+#font svg path:nth-child(11) {
+    /*stroke-dasharray: 535px;*/
+    /*stroke-dashoffset: 535px;*/
+    /*animation-delay: 2.1s;*/
+    stroke-dasharray: 605px;
+    stroke-dashoffset: 605px;
+}
+#font svg path:nth-child(12) {
+    stroke-dasharray: 267px;
+    stroke-dashoffset: 267px;
+    animation-delay: 2.4s;
+}
+#font svg path:nth-child(13) {
+    stroke-dasharray: 489px;
+    stroke-dashoffset: 489px;
+    animation-delay: 1.5s;
+}
+#me{
+    margin-top: 50px;
+    margin-bottom: 10px;
+    height:100px;
+}
+.profile{
+    width:100px;
+    border-radius: 50%;
+}
+#awards h2{
+    text-align: center;
+}
+.career_award{
+    margin-top : 50px;
+    margin-left: 100px;
+}
+#animation{
+    width: 100%;
+    float: left;
+}
+#animation h2{
+    text-align: center;
+    margin-bottom: 10px;
+}
+#navigator{
+    display: grid;
+    flex-direction : row;
+    width:100%;
+    margin: 0;
+    padding: 0;
+    background-color: #6495ED;
+    list-style-type: none;
+}
+.nav{
+    padding:10px;
+    cursor: pointer;
+}
+#navigator li{
+    float : left;
+    position: relative;
+}
+.nav a{
+    text-decoration: none;
+    text-align: center;
+    color : black;
+}
 .ani_heartbeat .back {
     /*position: fixed;*/
     position: relative;
     align-items: center;
-
-    background: white;
     /*animation-name: backdiv;*/
     animation-duration: 1s;
     animation-iteration-count: infinite;
@@ -87,28 +277,18 @@ section{
 }
 .ani_heartbeat {
     margin: 10px;
-    width:470px;
-    height: 90px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width : 50px;
+    height: 50px;
 }
 .cube_wrapper{
-    margin: 100px;
-    width:300px;
+    width : 300px;
     height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 .ani_heart .wrapper{
-    margin: 0px 100px 100px 100px;
-    width : 300px;
-    height: 200px;
+    margin: 10px;
+    width : 150px;
+    height: 150px;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 .ani_heart .wrapper path{
     stroke-dasharray: 54;
@@ -173,12 +353,15 @@ section{
     }
 
 }
-
+.ani_cube, .ani_cube2{
+    margin: 50px;
+    width: 300px;
+    height: 300px;
+}
 .ani_cube .cube_wrapper{
+    width: 300px;
+    height: 300px;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     transform-style: preserve-3d;
     /*transition: 2s;*/
     animation: aniXY 5s linear infinite;
@@ -192,10 +375,9 @@ section{
     }
 }
 .ani_cube2 .cube_wrapper{
+    width: 300px;
+    height: 300px;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     transform-style: preserve-3d;
     /*transition: 2s;*/
 }
@@ -218,8 +400,6 @@ section{
 
 .cube_wrapper div {
     /*margin: 20px;*/
-    width: 100%;
-    height: 100%;
     background-color: var(--color1);
     position: absolute;
     display: flex;
@@ -269,4 +449,60 @@ section{
     height: 300px;
     transform: rotateY(180deg) translateZ(150px);
     background-color: var(--color7);
+    background : var(--color7);
+}
+.cube_wrapper img{
+    width: 300px;
+    height: 300px;
+}
+
+.loading_wrapper {
+    margin: 100px;
+    width: 300px;
+    height: 300px;
+    float: left;
+    background-color: var(--color2);
+}
+.loading_wrapper svg {
+    width: 100%;
+    height: 100%;
+}
+
+.loading_wrapper svg line:nth-child(1) {
+    stroke-dasharray: 7;
+    animation: offset 2s linear infinite;
+}
+@keyframes offset {
+    from {
+        stroke-dashoffset: 0;
+    }
+    to {
+        stroke-dashoffset: 100;
+    }
+}
+.loading_wrapper svg circle {
+    fill: transparent;
+    stroke: var(--color1);
+    stroke-width: 2;
+    stroke-dasharray: 40;
+    stroke-linecap: round;
+    animation: circleAni 2s linear infinite;
+    transform-origin: 50% 50%;
+}
+@keyframes circleAni {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+aside{
+    width:100%;
+    height: 2000px;
+}
+footer{
+    width:100%;
+    bottom: 0px;
+    height: 50px;
 }
