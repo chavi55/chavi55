@@ -1030,7 +1030,8 @@ def lab_api(handler, method, path, query, body):
 MIME = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
         ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8",
         ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml",
-        ".ico": "image/x-icon"}
+        ".ico": "image/x-icon", ".wasm": "application/wasm",
+        ".zip": "application/zip"}
 
 
 class Handler(BaseHTTPRequestHandler):
