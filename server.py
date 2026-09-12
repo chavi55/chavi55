@@ -1112,7 +1112,7 @@ class Handler(BaseHTTPRequestHandler):
                 if lab_api(self, "GET", path, query, {}):
                     return
             if path in ("/", "/index.html"):
-                self.send_page("index.html")
+                self.send_atelier_page("index.html")
             elif path == "/host":
                 self.send_page("host.html")
             elif path == "/play":
