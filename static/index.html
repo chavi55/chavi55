@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>퀴즈 라이브!</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif; color: #fff;
+    background: linear-gradient(160deg, #5b21a8, #31106e); padding: 24px;
+  }
+  .card {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 560px;
+    text-align: center; backdrop-filter: blur(4px);
+  }
+  h1 { font-size: 44px; letter-spacing: 2px; margin-bottom: 8px; }
+  .sub { color: rgba(255,255,255,.75); margin-bottom: 28px; }
+  .pinbox {
+    background: rgba(0,0,0,.25); border-radius: 14px; padding: 16px; margin-bottom: 28px;
+  }
+  .pinbox .label { font-size: 14px; color: rgba(255,255,255,.7); }
+  .pinbox .pin { font-size: 40px; font-weight: 800; letter-spacing: 8px; }
+  .pinbox .phase { font-size: 14px; color: #ffd166; margin-top: 4px; }
+  .btns { display: flex; flex-direction: column; gap: 14px; }
+  a.btn {
+    display: block; padding: 18px; border-radius: 12px; font-size: 20px; font-weight: 700;
+    color: #fff; text-decoration: none; transition: transform .1s, filter .1s;
+  }
+  a.btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+  .host { background: #ff3355; }
+  .play { background: #26890c; }
+  .lab { background: #1f7ae0; }
+  .note { margin-top: 26px; font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.7; }
+  .note b { color: #fff; }
+  .url { color: #ffd166; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>퀴즈 라이브!</h1>
+  <div class="sub">Kahoot! 스타일 실시간 단체 퀴즈</div>
+  <div class="pinbox">
+    <div class="label">현재 게임 PIN</div>
+    <div class="pin" id="pin">······</div>
+    <div class="phase" id="phase">상태 확인 중…</div>
+  </div>
+  <div class="btns">
+    <a class="btn host" href="/host">진행자 화면 열기</a>
+    <a class="btn play" href="/play">참가자로 입장</a>
+    <a class="btn lab" href="/python">🐍 파이썬 조건문 실험실</a>
+  </div>
+  <div class="note">
+    스마트폰/다른 컴퓨터에서 참여하려면 <b>같은 Wi-Fi(네트워크)</b>에 연결한 뒤<br>
+    아래 주소로 접속하세요<br>
+    <span class="url" id="url">http://…:8000/play</span>
+  </div>
+</div>
+<script>
+async function refresh() {
+  try {
+    const r = await fetch('/api/info');
+    const d = await r.json();
+    document.getElementById('pin').textContent = d.pin || '대기 중';
+    const phaseMap = { idle: '게임 준비 전', lobby: '로비 — 참가자 입장 중', question: '문제 진행 중',
+                       reveal: '정답 공개', scoreboard: '순위 발표', final: '최종 결과' };
+    document.getElementById('phase').textContent =
+      (phaseMap[d.phase] || d.phase) + ' · 참가자 ' + d.players + '명 · ' + d.q_total + '문제';
+    document.getElementById('url').textContent = 'http://' + d.lan_ip + ':' + d.port + '/play';
+  } catch (e) {}
+}
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

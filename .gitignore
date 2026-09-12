@@ -1,0 +1,6 @@
+__pycache__/
+*.log
+atelier.json
+atelier.json.tmp
+node_modules/
+atelier-build/

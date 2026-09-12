@@ -1,0 +1,660 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파이썬 조건문 실험실 - 에러 번역 도우미</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; color:#33323b;
+  background:linear-gradient(160deg,#fdf1e0,#e3f2fd 55%,#fce4ec); min-height:100vh; padding:24px 16px 44px; }
+.wrap { max-width:1080px; margin:0 auto; }
+.hero { text-align:center; margin-bottom:20px; }
+.hero h1 { font-family:'Jua','Malgun Gothic',sans-serif; font-size:38px; color:#5b4a86; }
+.hero .badge { display:inline-block; background:#fff; color:#7a5cff; font-weight:800; font-size:13px;
+  border-radius:999px; padding:6px 16px; margin:8px 0 6px; box-shadow:0 4px 12px rgba(90,60,150,.12); }
+.hero .sub { font-size:15px; color:#6b6579; }
+.hero .sub b { color:#e8590c; }
+.pill { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
+  border-radius:999px; padding:6px 14px; margin-top:10px; }
+.pill.wait { background:#fff3cd; color:#9a7b16; }
+.pill.ready { background:#d9f7e5; color:#178a52; }
+.pill.fail { background:#ffe0e0; color:#c0392b; }
+main.grid { display:grid; grid-template-columns:1.2fr 1fr; gap:18px; align-items:start; }
+.card { background:#fff; border-radius:22px; box-shadow:0 8px 24px rgba(80,60,120,.10); padding:18px; }
+.card h2 { font-family:'Jua','Malgun Gothic',sans-serif; font-size:20px; color:#5b4a86; margin-bottom:12px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.chip { border:2px solid #ffd166; background:#fffdf3; color:#8a6d1a; border-radius:999px;
+  padding:7px 14px; font-size:13.5px; font-weight:700; cursor:pointer; transition:.15s; }
+.chip:hover { background:#ffd166; color:#fff; transform:translateY(-1px); }
+.toolbar { display:flex; gap:10px; margin-bottom:12px; align-items:center; }
+button.run { flex:1; font-family:'Jua','Malgun Gothic',sans-serif; font-size:20px; color:#fff;
+  background:linear-gradient(135deg,#ffb347,#ff6b6b); border:none; border-radius:999px;
+  padding:13px 20px; cursor:pointer; box-shadow:0 6px 16px rgba(255,107,107,.35); }
+button.run:disabled { opacity:.55; cursor:not-allowed; }
+button.ghost { background:#fff; border:2px solid #e3dded; color:#6b6579; border-radius:999px;
+  padding:12px 18px; font-weight:700; font-size:14px; cursor:pointer; }
+.editorbox { display:flex; border:2px solid #e8e4f0; border-radius:14px; overflow:hidden; background:#fffdf8; }
+.gutter { padding:14px 8px 14px 12px; text-align:right; color:#c9c3d6; background:#f6f3ee;
+  font:14px/1.65 Consolas,monospace; white-space:pre; user-select:none; min-width:46px; overflow:hidden; }
+textarea#code { flex:1; border:none; outline:none; resize:none; height:380px; padding:14px;
+  font:14px/1.65 Consolas,'Malgun Gothic',monospace; background:transparent;
+  white-space:pre; overflow:auto; tab-size:4; }
+.console { background:#1e2a38; border-radius:14px; min-height:380px; max-height:470px;
+  overflow:auto; padding:14px; font:14px/1.7 Consolas,monospace; color:#eaf2ff; }
+.console .out { white-space:pre-wrap; word-break:break-all; color:#d7f5df; }
+.console .echo { color:#ffd166; margin:2px 0; }
+.console .ok { display:inline-block; background:#2ecc71; color:#fff; font-family:'Jua','Malgun Gothic',sans-serif;
+  padding:6px 16px; border-radius:999px; margin-bottom:10px; }
+.console .hintline { color:#8fa8c7; }
+.kbdnote { font-size:12.5px; color:#a09bb0; margin-top:8px; text-align:right; }
+footer.friends { margin-top:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.friend { background:#fff; border-radius:16px; padding:14px; text-align:center;
+  box-shadow:0 4px 14px rgba(80,60,120,.08); font-size:13px; line-height:1.6; color:#6b6579; }
+.friend .face { font-size:28px; line-height:1.2; }
+.friend b { font-family:'Jua','Malgun Gothic',sans-serif; font-size:15px; color:#5b4a86; display:block; margin:2px 0; }
+.overlay { position:fixed; inset:0; background:rgba(40,35,70,.45); backdrop-filter:blur(3px);
+  display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
+.hidden { display:none !important; }
+.popup { background:#fff; border-radius:26px; max-width:560px; width:100%; padding:28px 26px 22px;
+  text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.25); animation:pop .25s ease; }
+@keyframes pop { from { transform:scale(.85); opacity:0; } to { transform:scale(1); opacity:1; } }
+.popup .face { font-size:60px; line-height:1.1; }
+.popup h2 { font-family:'Jua','Malgun Gothic',sans-serif; font-size:24px; color:#ff7a59; margin:6px 0 10px; }
+.line-badge { display:inline-block; background:#fff3cd; color:#9a7b16; font-weight:800;
+  border-radius:999px; padding:6px 14px; font-size:14px; margin-bottom:12px; }
+.popup .msg { white-space:pre-wrap; font-size:16.5px; line-height:1.75; text-align:left;
+  background:#f7f5ff; border-radius:14px; padding:16px; margin-bottom:12px; }
+.offending { text-align:left; background:#fff8e6; border-left:5px solid #ffb020; border-radius:8px;
+  padding:10px 12px; font:13.5px Consolas,monospace; white-space:pre-wrap; word-break:break-all; margin-bottom:12px; }
+.tip { text-align:left; background:#e9f9ef; border:2px dashed #58c98b; border-radius:14px;
+  padding:12px 14px; font-size:15px; line-height:1.7; margin-bottom:14px; }
+.tip .t { font-weight:800; color:#1d9a5b; display:block; margin-bottom:4px; }
+.tip pre { font:13.5px Consolas,monospace; background:#fff; border-radius:8px; padding:10px; overflow:auto; margin-top:6px; }
+.popup details { text-align:left; font-size:12.5px; color:#9a96a8; margin-bottom:14px; }
+.popup details pre { background:#f4f2f8; border-radius:8px; padding:8px 10px; margin-top:6px;
+  font:12px Consolas,monospace; white-space:pre-wrap; word-break:break-all; }
+.popup button.close { font-family:'Jua','Malgun Gothic',sans-serif; font-size:19px; color:#fff;
+  background:linear-gradient(135deg,#ff9f43,#ff6b6b); border:none; border-radius:999px; padding:13px 34px; cursor:pointer; }
+.popup button.close:hover { filter:brightness(1.07); }
+.spinner { font-size:44px; animation:bounce 1s infinite; display:inline-block; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.bar { height:10px; background:#eee; border-radius:999px; overflow:hidden; margin:14px 0 10px; }
+.bar i { display:block; height:100%; width:40%; background:linear-gradient(90deg,#5b8def,#8ab6ff);
+  border-radius:999px; animation:slide 1.2s infinite; }
+@keyframes slide { from{margin-left:-40%} to{margin-left:100%} }
+@media (max-width:900px){ main.grid{grid-template-columns:1fr} footer.friends{grid-template-columns:1fr} textarea#code{height:300px} .console{min-height:300px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <h1>🐍 파이썬 조건문 실험실</h1>
+  <div class="badge">중학교 2학년 정보 · [9정03-06] 조건문</div>
+  <p class="sub">영어 에러 메시지가 떠도 겁먹지 마세요! <b>에러 번역 도우미</b>가 우리말로 바꿔 알려줄게요. 😊</p>
+  <span id="pill" class="pill wait">⏳ 파이썬 엔진 불러오는 중…</span>
+</header>
+
+<main class="grid">
+  <section class="card">
+    <h2>✏️ 코드 실험실</h2>
+    <div class="chips" id="chips"></div>
+    <div class="toolbar">
+      <button id="runBtn" class="run" disabled>▶ 실행하기</button>
+      <button id="clearBtn" class="ghost">🧹 지우기</button>
+    </div>
+    <div class="editorbox">
+      <div class="gutter" id="gutter">1</div>
+      <textarea id="code" spellcheck="false" wrap="off" autocapitalize="off" autocomplete="off"></textarea>
+    </div>
+    <div class="kbdnote">💡 <b>Ctrl + Enter</b>로도 실행 · 들여쓰기는 스페이스 4칸!</div>
+  </section>
+
+  <section class="card">
+    <h2>🖥️ 실행 결과</h2>
+    <div class="console" id="console">
+      <span class="hintline">여기에 실행 결과가 나타나요. ▶ 실행하기를 눌러 보세요!</span>
+    </div>
+  </section>
+</main>
+
+<footer class="friends">
+  <div class="friend"><div class="face">:</div><b>콜론(:) 친구</b>if · elif · else 줄 끝을 항상 지켜요</div>
+  <div class="friend"><div class="face">🪜</div><b>들여쓰기 친구</b>조건 안의 명령은 오른쪽으로 4칸!</div>
+  <div class="friend"><div class="face">📣</div><b>따옴표(' ') 친구</b>글자(문자)는 따옴표로 감싸 줘요</div>
+</footer>
+</div>
+
+<div id="popup" class="overlay hidden">
+  <div class="popup" role="dialog" aria-modal="true">
+    <div class="face" id="pFace">🤔</div>
+    <h2 id="pTitle">어라, 잠깐!</h2>
+    <div class="line-badge" id="pLine">📍 4번째 줄</div>
+    <div class="msg" id="pMsg"></div>
+    <pre class="offending" id="pCode"></pre>
+    <div class="tip" id="pTip"></div>
+    <details id="pRaw"><summary>번역 전 영문 메시지 보기 (선생님 확인용)</summary><pre id="pRawText"></pre></details>
+    <button class="close" id="pClose">알겠어! 바로 고쳐 볼게요 💪</button>
+  </div>
+</div>
+
+<div id="loading" class="overlay">
+  <div class="popup">
+    <span class="spinner">🐍</span>
+    <h2>파이썬 엔진을 불러오고 있어요</h2>
+    <div class="bar"><i></i></div>
+    <p style="font-size:14.5px;line-height:1.7;color:#7a7688;">첫 실행 때는 진짜 파이썬 엔진을 인터넷에서 내려받아요.<br>10~20초 정도 기다려 주세요! ☕</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const editor = $('code'), gutter = $('gutter'), consoleEl = $('console');
+const runBtn = $('runBtn'), pill = $('pill'), popup = $('popup'), loading = $('loading');
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+const EXAMPLES = [
+  { label: '① if — 합격일까?', code: `score = int(input("점수를 입력하세요: "))
+
+if score >= 90:
+    print("합격입니다! 짝짝짝!")
+
+print("시험 끝! 모두들 수고했어요.")` },
+  { label: '② if-else — 짝수? 홀수?', code: `number = int(input("숫자를 입력하세요: "))
+
+if number % 2 == 0:
+    print(number, "은(는) 짝수예요.")
+else:
+    print(number, "은(는) 홀수예요.")` },
+  { label: '③ elif — 학점 계산', code: `score = int(input("점수를 입력하세요: "))
+
+if score >= 90:
+    print("A 학점! 최고예요!")
+elif score >= 80:
+    print("B 학점! 훌륭해요!")
+elif score >= 70:
+    print("C 학점! 조금만 더!")
+else:
+    print("다음 시험은 더 잘할 수 있어요!")` },
+  { label: '🎯 미션: 에러 잡기', code: `# 미션: 에러를 모두 잡아 보세요!
+# 영어 대신 우리 도우미가 한국어로 알려줄 거예요.
+
+temperature = 29
+
+if temperature >= 28          # <- 6번째 줄, 뭔가 빠진 것 같아?
+    print("무더위 주의보예요!")
+else:
+print("멀쩡한 날씨예요!")      # <- 이 친구는 어디에 서야 할까?` }
+];
+
+const chipsEl = $('chips');
+EXAMPLES.forEach((ex, i) => {
+  const b = document.createElement('button');
+  b.className = 'chip';
+  b.textContent = ex.label;
+  b.addEventListener('click', () => loadExample(i));
+  chipsEl.appendChild(b);
+});
+
+function updateGutter() {
+  const n = editor.value.split('\n').length;
+  let s = '';
+  for (let i = 1; i <= n; i++) s += i + '\n';
+  gutter.textContent = s;
+}
+editor.addEventListener('input', updateGutter);
+editor.addEventListener('scroll', () => { gutter.scrollTop = editor.scrollTop; });
+
+function insertText(t) {
+  const s = editor.selectionStart, e = editor.selectionEnd;
+  editor.value = editor.value.slice(0, s) + t + editor.value.slice(e);
+  editor.selectionStart = editor.selectionEnd = s + t.length;
+  updateGutter();
+}
+editor.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Tab') { ev.preventDefault(); insertText('    '); }
+  else if (ev.key === 'Enter') {
+    ev.preventDefault();
+    const pos = editor.selectionStart;
+    const before = editor.value.slice(0, pos);
+    const cur = before.slice(before.lastIndexOf('\n') + 1);
+    let ind = (cur.match(/^ */) || [''])[0];
+    if (cur.trimEnd().endsWith(':')) ind += '    ';
+    insertText('\n' + ind);
+  }
+});
+
+function resetConsole() { consoleEl.innerHTML = ''; }
+function printOut(text) {
+  const pre = document.createElement('pre');
+  pre.className = 'out';
+  pre.textContent = text;
+  consoleEl.appendChild(pre);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+function printOk(text) {
+  const d = document.createElement('div');
+  d.className = 'ok';
+  d.textContent = text;
+  consoleEl.appendChild(d);
+}
+function printHint(text) {
+  const d = document.createElement('div');
+  d.className = 'hintline';
+  d.textContent = text;
+  consoleEl.appendChild(d);
+}
+function echoInput(v) {
+  const d = document.createElement('div');
+  d.className = 'echo';
+  d.textContent = '⌨️ ' + v;
+  consoleEl.appendChild(d);
+}
+function loadExample(i) {
+  editor.value = EXAMPLES[i].code;
+  updateGutter();
+  resetConsole();
+  printHint('예제를 불러왔어요! ▶ 실행하기를 눌러 보세요.');
+  editor.scrollTop = 0; gutter.scrollTop = 0;
+}
+$('clearBtn').addEventListener('click', () => { editor.value = ''; updateGutter(); editor.focus(); });
+
+const PY_SETUP = `
+import json, sys, io, re, keyword, difflib
+import builtins as _b
+
+_HINTS = keyword.kwlist + ['print', 'input', 'int', 'str', 'float', 'bool', 'len', 'range',
+                           'list', 'dict', 'sum', 'min', 'max', 'abs', 'round', 'sorted',
+                           'type', 'append', 'upper', 'lower', 'get', 'keys', 'values']
+_GOOD = {'if', 'elif', 'else', 'print', 'input', 'int', 'str', 'float', 'True', 'False',
+         'None', 'and', 'or', 'not', 'while', 'for', 'in', 'def', 'return', 'range', 'len',
+         'list', 'dict', 'sum', 'min', 'max', 'abs', 'round', 'sorted', 'type'}
+_ATTRS = ['append', 'upper', 'lower', 'title', 'strip', 'split', 'join', 'format', 'keys',
+          'values', 'items', 'get', 'sort', 'reverse', 'pop', 'count', 'index', 'replace']
+
+def _close(name):
+    m = difflib.get_close_matches(name, _HINTS, n=1, cutoff=0.6)
+    return m[0] if m else None
+
+def _frame_line(tb):
+    line = None
+    while tb is not None:
+        if tb.tb_frame.f_code.co_filename == '<학생코드>':
+            line = tb.tb_lineno
+        tb = tb.tb_next
+    return line
+
+def _syntax_hint(text):
+    for tok in re.findall(r'[A-Za-z_][A-Za-z_0-9]*', text or ''):
+        if tok in _GOOD or tok in dir(_b):
+            continue
+        s = _close(tok)
+        if s and s in _GOOD:
+            return {'kind': 'name', 'found': tok, 'suggest': s}
+    return None
+
+def run_student_code(code):
+    buf = io.StringIO()
+    sys.stdout = buf
+    err = None
+    try:
+        exec(compile(code, '<학생코드>', 'exec'), {'__name__': '__main__'})
+    except SyntaxError as e:
+        text = (e.text or '').strip()
+        err = {'type': type(e).__name__, 'msg': e.msg or '', 'line': e.lineno,
+               'text': text, 'hint': _syntax_hint(text), 'name': None}
+    except BaseException as e:
+        line = _frame_line(e.__traceback__)
+        text = ''
+        if line:
+            parts = code.splitlines()
+            if len(parts) >= line:
+                text = parts[line - 1].strip()
+        hint = None
+        m = re.search(r"name '([^']+)'", str(e))
+        if m:
+            s = _close(m.group(1))
+            if s and s in _GOOD:
+                hint = {'kind': 'name', 'found': m.group(1), 'suggest': s}
+        if not hint:
+            mm = re.search(r"No module named '([^']+)'", str(e))
+            if mm:
+                hint = {'kind': 'module', 'found': mm.group(1)}
+        if not hint:
+            ma = re.search(r"has no attribute '([^']+)'", str(e))
+            if ma:
+                s2 = difflib.get_close_matches(ma.group(1), _ATTRS, n=1, cutoff=0.6)
+                if s2:
+                    hint = {'kind': 'attr', 'found': ma.group(1), 'suggest': s2[0]}
+        err = {'type': type(e).__name__, 'msg': str(e), 'line': line, 'text': text,
+               'hint': hint, 'name': (m.group(1) if m else None)}
+    finally:
+        sys.stdout = sys.__stdout__
+    return json.dumps({'out': buf.getvalue(), 'err': err})
+`;
+
+let pyodide = null, ready = false;
+
+async function init() {
+  try {
+    if (typeof loadPyodide === 'undefined') throw new Error('CDN 로드 실패');
+    pill.textContent = '⏳ 파이썬 엔진 내려받는 중…';
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/' });
+    pyodide.setStdin({ stdin: () => {
+      const v = window.prompt('⌨️ 파이썬이 입력을 기다리고 있어요!\n값을 쓰고 확인을 눌러 주세요:');
+      if (v === null) return '';
+      echoInput(v);
+      return v;
+    }});
+    pyodide.runPython(PY_SETUP);
+    pyodide.runStudentCode = pyodide.globals.get('run_student_code');
+    ready = true;
+    runBtn.disabled = false;
+    pill.className = 'pill ready';
+    pill.textContent = '✅ 파이썬 준비 완료!';
+    loading.classList.add('hidden');
+    loadExample(0);
+  } catch (e) {
+    pill.className = 'pill fail';
+    pill.textContent = '❌ 엔진 로드 실패';
+    loading.querySelector('h2').textContent = '엔진을 불러오지 못했어요 😢';
+    loading.querySelector('p').innerHTML = '인터넷 연결을 확인하고 <b>새로고침(F5)</b> 해 주세요.<br>학교 네트워크라면 선생님께 말씀해 주세요!';
+  }
+}
+async function runCode() {
+  if (!ready || !editor.value.trim()) return;
+  resetConsole();
+  runBtn.disabled = true;
+  runBtn.textContent = '⏳ 실행 중…';
+  await new Promise((r) => setTimeout(r, 30));
+  let res;
+  try {
+    res = JSON.parse(pyodide.runStudentCode(editor.value));
+  } catch (e) {
+    printHint('알 수 없는 문제가 생겼어요. 다시 시도해 주세요.');
+    runBtn.disabled = false;
+    runBtn.textContent = '▶ 실행하기';
+    return;
+  }
+  runBtn.disabled = false;
+  runBtn.textContent = '▶ 실행하기';
+  if (res.err) { showFriendlyError(res.err); return; }
+  const SUCCESS = [
+    '🎉 실행 성공! 파이썬이 네 명령을 척척 이해했어요!',
+    '🌟 성공! 코드가 말을 잘 들었어요!',
+    '✅ 잘했어요! 파이썬도 너와 함께라면 무적!'
+  ];
+  printOk(SUCCESS[Math.floor(Math.random() * SUCCESS.length)]);
+  if (res.out) printOut(res.out.replace(/\n+$/, ''));
+  else printHint('(출력 결과가 없어요 — print()를 썼는지 확인해 볼까?)');
+}
+runBtn.addEventListener('click', runCode);
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { ev.preventDefault(); runCode(); }
+  if (ev.key === 'Escape') popup.classList.add('hidden');
+});
+
+function showFriendlyError(err) {
+  const f = buildFriendly(err);
+  $('pFace').textContent = f.emoji;
+  $('pTitle').textContent = f.title;
+  $('pLine').textContent = err.line ? ('📍 ' + err.line + '번째 줄') : '📍 위치 알 수 없음';
+  $('pMsg').textContent = f.msg;
+  const pc = $('pCode');
+  if (err.text) { pc.style.display = 'block'; pc.textContent = '문제가 된 줄: ' + err.text; }
+  else pc.style.display = 'none';
+  const tip = $('pTip');
+  if (f.tip) { tip.style.display = 'block'; tip.innerHTML = '<span class="t">💡 이렇게 고쳐 보자!</span>' + f.tip; }
+  else tip.style.display = 'none';
+  $('pRawText').textContent = (err.type || 'Error') + ': ' + (err.msg || '') + (err.line ? ('  (line ' + err.line + ')') : '');
+  popup.classList.remove('hidden');
+}
+$('pClose').addEventListener('click', () => popup.classList.add('hidden'));
+popup.addEventListener('click', (ev) => { if (ev.target === popup) popup.classList.add('hidden'); });
+
+function CASE(h) {
+  const f = h.found, s = h.suggest;
+  const cap = (f[0] !== s[0] && f[0] === f[0].toUpperCase());
+  const msg = cap
+    ? "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 첫 글자를 대문자 '" + f[0] + "'로 쓰면 '" + f + "'가 누군지 도통 알아듣지 못한대! 소문자 '" + s[0] + "'로 바꾸어 적어볼까? 🐍"
+    : "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 대문자와 소문자를 전혀 다른 글자로 구별해! '" + f + "'라고 쓰면 '" + s + "'가 누군지 도통 알아듣지 못한대! '" + s + "'로 바꾸어 적어볼까? 🐍";
+  return { emoji: '🔤', title: '대·소문자를 구별해요!', msg: msg,
+    tip: '<pre>' + f + '   ← X (파이썬은 이 이름을 몰라요)\n' + s + '   ← O! 철자·대소문자를 똑같이 적으면 알아들어요</pre>' };
+}
+function TYPO(h) {
+  return { emoji: '🔍', title: '철자 탐정 출동!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, '" + h.found + "'라는 이름은 파이썬 친구 목록 어디에도 없어서 도통 알아듣지 못한대! 혹시 '" + h.suggest + "'를 쓰려던 거라면 철자를 바로잡아 적어볼까? 🐍",
+    tip: '<pre>' + h.found + '   ← X (파이썬이 모르는 이름)\n' + h.suggest + '   ← O! 이게 진짜 이름이에요</pre>' };
+}
+function BOOL(h) {
+  return { emoji: '🐵', title: '첫 글자가 대문자!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 참/거짓은 " + h.suggest + "처럼 첫 글자를 대문자로 써야만 알아듣는대! " + h.suggest + "로 바꾸어 적어볼까? 🐍",
+    tip: '<pre>' + h.found + '    ← X (파이썬은 이 이름을 몰라요)\n' + h.suggest + '   ← O! 참/거짓은 첫 글자를 대문자로</pre>' };
+}
+function COLON(L) {
+  return { emoji: '🕵️', title: '콜론 친구가 숨었어요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, ' + L + ' 끝에 콜론(:) 친구가 없으면 문장이 끝났는지 도통 알아듣지 못한대! if, elif, else, for, while, def 줄의 맨 끝에 콜론(:)을 붙여 적어볼까? 🐍',
+    tip: '<pre>if score >= 90<span style="color:#e67e22;font-weight:800">:</span>\nelif score >= 80<span style="color:#e67e22;font-weight:800">:</span>\nelse<span style="color:#e67e22;font-weight:800">:</span>\nwhile n &lt; 10<span style="color:#e67e22;font-weight:800">:</span>\nfor i in range(5)<span style="color:#e67e22;font-weight:800">:</span>\ndef hello()<span style="color:#e67e22;font-weight:800">:</span>\n     ↑ 이런 줄들의 맨 끝에는 항상 콜론(:)!</pre>' };
+}
+function NEED_INDENT(kw, L) {
+  return { emoji: '🪜', title: '들여쓰기가 필요해요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, ' + kw + ' 친구 바로 아래 줄이 딱 붙어 있으면 그 명령이 ' + kw + ' 속에 들어가는지 도통 알아듣지 못한대! ' + L + ' 다음 줄을 스페이스바 4번, 오른쪽으로 들여 적어볼까? 🐍',
+    tip: '<pre>' + (kw === 'def' ? 'def hello():\n    print("안녕!")     ← 오른쪽으로 4칸!'
+      : kw === 'for' ? 'for i in range(5):\n    print(i)           ← 오른쪽으로 4칸!'
+      : kw === 'while' ? 'while n &lt; 10:\n    print(n)           ← 오른쪽으로 4칸!'
+      : 'if score >= 90:\n    print("합격!")      ← 오른쪽으로 4칸!') + '</pre>' };
+}
+function BAD_INDENT(L) {
+  return { emoji: '😳', title: '줄이 갑자기 나왔어요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, ' + L + '가 갑자기 앞으로 튀어나와 있으면 줄의 층이 어디인지 도통 알아듣지 못한대! 줄 맨 앞의 빈칸 개수를 위아래 줄과 맞추어 적어볼까? 🐍',
+    tip: '<pre>if score >= 90:\n    print("A")\n  print("B")    ← X! 층이 갑자기 달라졌어요\n    print("B")   ← O! 윗줄과 같은 층으로</pre>' };
+}
+function STAIRS(L) {
+  return { emoji: '🧗', title: '계단 높이가 달라요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 들여쓰기 계단 높이(빈칸 수)가 제각각이면 어느 층의 명령인지 도통 알아듣지 못한대! ' + L + '의 빈칸 개수를 윗줄들과 똑같이 맞추어 적어볼까? 탭(Tab)과 스페이스가 섞이지 않았는지도 확인해요. 🐍',
+    tip: '<pre>for i in range(3):\n    print(i)\n      print(i)  ← X! 같은 층인데 높이가 달라요\n    print(i)    ← O! 스페이스 4칸으로 통일</pre>' };
+}
+function QUOTES(L) {
+  return { emoji: '🔒', title: '따옴표 짝꿍이 필요해요!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 따옴표(' ') 친구가 반쪽만 있으면 글자가 어디서 끝나는지 도통 알아듣지 못한대! " + L + '의 문자를 양쪽 따옴표로 꼭 감싸 적어볼까? 🐍',
+    tip: '<pre>print("안녕하세요")   ← 앞뒤 따옴표 짝꿍!</pre>' };
+}
+function PAREN(L) {
+  return { emoji: '🧩', title: '괄호 짝꿍을 세어보세요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 괄호 ( ) 나 대괄호 [ ] 의 짝 개수가 다르면 어디서 계산이 끝나는지 도통 알아듣지 못한대! ' + L + ' 근처에서 짝꿍 괄호를 하나씩 세어 적어볼까? 🐍',
+    tip: '<pre>print("안녕"        ← X! ( 는 열었는데 닫는 ) 가 없어요\nprint("안녕")       ← O! 짝꿍 괄호 완성!\nnums = [1, 2, 3     ← 대괄호 [ ] 도 짝꿍이 필요해요\nnums = [1, 2, 3]</pre>' };
+}
+function ASSIGN() {
+  return { emoji: '📦', title: '상자에 담는 방향!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, =(등호)는 '오른쪽 값을 왼쪽 이름표 상자에 넣는다'는 뜻이라 왼쪽에 숫자·참거짓·예약어가 오면 도통 알아듣지 못한대! 왼쪽에는 상자 이름(변수)을 적어볼까? 🐍",
+    tip: '<pre>score = 90   ← O (90을 score 상자에 담기)\n90 = score   ← X (90은 상자가 아니에요!)\nfor = 3      ← X (for, if 같은 예약어는 이름이 될 수 없어요!)</pre>' };
+}
+function SYMBOL() {
+  return { emoji: '🚫', title: '수상한 기호 발견!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 한글 자판의 겉보기 같은 기호(：, （）, ' ')는 진짜 기호와 전혀 다른 글자라 도통 알아듣지 못한대! 콜론(:), 괄호(), 따옴표(')를 모두 영문 반쪽으로 다시 적어볼까? 🐍",
+    tip: '<pre>if score >= 90：    ← X! 한글 자판 큰 콜론\nif score >= 90:     ← O! 영문 반쪽 콜론\nprint（"안녕"）     ← X! 한글 자판 괄호\nprint("안녕")      ← O! 영문 반쪽 괄호</pre>' };
+}
+function ELSE_ALONE(L) {
+  return { emoji: '👫', title: '짝꿍 if가 필요해요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, else와 elif는 짝꿍 if 없이는 혼자 쓸 수 없어서 도통 알아듣지 못한대! ' + L + ' 바로 위에 if 친구가 있는지 찾아 적어볼까? 🐍',
+    tip: '<pre>score = 85\nif score >= 90:\n    print("A")\nelse:            ← O! if와 같은 층(들여쓰기)에 있어야 해요\n    print("B")\n\nelse:            ← X! 위에 if가 없으면 혼자 못 써요</pre>' };
+}
+function NAME(name, L) {
+  return { emoji: '🧐', title: '처음 보는 이름이에요!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, '" + name + "'이라는 상자(변수)를 아직 만든 적이 없으면 도통 알아듣지 못한대! 철자를 확인하고, 필요하면 앞줄에서 먼저 값을 넣어 만들어볼까? 🐍",
+    tip: '<pre>score = 90     ← 먼저 상자(변수)를 만들고\nprint(score)   ← 그다음에 이름을 불러 사용!</pre>' };
+}
+function STRCONCAT(L) {
+  return { emoji: '➕', title: '글자에 숫자를 붙였어요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 글자(문자열)에 숫자를 바로 붙이면 도통 알아듣지 못한대! str()로 숫자를 글자로 바꾸거나, print 안에서 콤마(,)로 나열해 적어볼까? 🐍',
+    tip: '<pre>print("나이:", age)\nprint("나이: " + str(age))</pre>' };
+}
+function UNSUPPORTED(L) {
+  return { emoji: '🧮', title: '이 계산은 못 해요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 숫자와 글자를 +, -, * 로 한꺼번에 계산하면 도통 알아듣지 못한대! int()로 글자를 숫자로 바꾸어 적어볼까? 🐍',
+    tip: '<pre>print("나이: " + 12)      ← X! 글자 + 숫자는 못 더해요\nprint("나이: " + str(12)) ← O! 숫자를 글자로 바꾸기\nprint("나이:", 12)        ← O! 콤마(,)로 나열해도 OK</pre>' };
+}
+function MULSEQ(L) {
+  return { emoji: '🔁', title: '반복 횟수를 확인!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 글자 반복은 딱 정수 번만 가능해서 1.5번 같은 소수점 횟수는 도통 알아듣지 못한대! 반복 횟수를 정수로 적어볼까? 🐍',
+    tip: '<pre>print("하이" * 2.5)   ← X! 2.5번 반복은 애매해요\nprint("하이" * 3)     ← O! 딱 정수 번만 반복 가능</pre>' };
+}
+function COMPARE(L) {
+  return { emoji: '📏', title: '글자와 숫자는 비교 금지!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 글자(문자)와 숫자는 크기를 비교할 수 없어서 도통 알아듣지 못한대! input()로 받은 값은 글자이니 int()로 감싸 숫자로 바꾸어 적어볼까? 🐍",
+    tip: '<pre>score = int(input("점수: "))   ← int()로 감싸기!</pre>' };
+}
+function COMPARE_STR() {
+  return { emoji: '🔢', title: '글자끼리 비교하면 곤란!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 글자끼리 비교하면 '9'가 '10'보다 크다는 이상한 대답이 나와 진짜 크기를 알려주지 못한대! int()로 숫자로 바꾸어 적어볼까? 🐍",
+    tip: '<pre>answer = input("숫자: ")   ← input()은 무조건 글자!\nif answer &gt; 10:            ← X! 글자끼리 비교 중이에요\nif int(answer) &gt; 10:       ← O! int()로 숫자로 바꾸고 비교</pre>' };
+}
+function NOTCALL(L) {
+  return { emoji: '🚫', title: '명령이 아니에요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 숫자나 글자 값에 ()를 붙여 명령처럼 부르면 도통 알아듣지 못한대! 이름과 명령이 섞이지 않았는지 확인하고 다시 적어볼까? 🐍',
+    tip: '<pre>x = 5\nx()           ← X! 숫자 5는 명령이 아니에요\nprint(x)      ← O! 값을 보고 싶으면 print() 사용</pre>' };
+}
+function LISTIDX(L) {
+  return { emoji: '🔢', title: '리스트 번호는 정수로!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 리스트에서 몇 번째를 꺼낼지는 반드시 정수로 알려줘야 하는데 글자로 알려주면 도통 알아듣지 못한대! 인덱스를 int()로 정수로 바꾸어 적어볼까? 🐍',
+    tip: '<pre>nums = ["철수", "영희"]\nnums["1"]        ← X! 번호를 글자로 알려줬어요\nnums[int("1")]   ← O! int()로 정수로 바꾸기\nnums[1]          ← O! 처음부터 정수로 쓰기</pre>' };
+}
+function IDXERR(L) {
+  return { emoji: '📭', title: '리스트에 없는 번째예요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 리스트에 없는 번째를 꺼내 달라고 하면 도통 알아듣지 못한대! 리스트 번호는 0부터 시작하고, 길이는 len()으로 셀 수 있다는 점을 기억하며 다시 세어 적어볼까? 🐍',
+    tip: '<pre>nums = [10, 20, 30]   ← 칸 번호는 0, 1, 2 (세 개!)\nprint(nums[3])        ← X! 3번 칸은 없어요\nprint(nums[2])        ← O! 마지막 칸은 (길이-1)번\nprint(len(nums))      ← 칸이 몇 개인지는 len()으로!</pre>' };
+}
+function KEYERR(key, L) {
+  return { emoji: '🗝️', title: '사전에 없는 열쇠예요!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 사전(dict)에 없는 열쇠 '" + key + "'를 찾으라고 하면 도통 알아듣지 못한대! 열쇠 철자를 확인하고, 없을 수도 있다면 .get()으로 물어보듯 적어볼까? 🐍",
+    tip: '<pre>price = {"사과": 1000, "배": 2000}\nprint(price["포도"])          ← X! 사전에 없는 열쇠예요\nprint(price.get("포도", 0))   ← O! 없으면 0으로 안전하게\nprint("포도" in price)        ← O! 먼저 있는지 확인도 가능</pre>' };
+}
+function INTCONV(bad, L) {
+  return { emoji: '🔢', title: '숫자로 바꾸기 실패!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, ' + (bad ? "'" + bad + "'는 " : '') + '숫자 모양이 아니라서 int()로 바꾸다 실패했대! 입력값이 진짜 숫자인지 확인하고 다시 적어볼까? 🐍',
+    tip: '<pre>int("10")       ← O! 숫자 모양 글자는 바꿀 수 있어요\nint("열")       ← X! "열"은 숫자 모양이 아니에요\nn = input()         ← input()은 무조건 글자로 받아요\nn = int(input())    ← 숫자가 필요하면 int()로 감싸기</pre>' };
+}
+function DIV0(L) {
+  return { emoji: '🚧', title: '0으로 나누기는 금지!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 0으로 나누기는 수학에서도 정해진 대답이 없어서 도통 알아듣지 못한대! 나누는 수(오른쪽 값)가 0이 아닌지 확인하고 다시 적어볼까? 🐍',
+    tip: '<pre>a = 10\nb = 0\nprint(a / b)   ← X! b가 0이면 계산할 수 없어요\nif b != 0:     ← O! 나누기 전에 0이 아닌지 검사\n    print(a / b)</pre>' };
+}
+function EOF(L) {
+  return { emoji: '⌨️', title: '입력이 필요해요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, input()으로 기다렸는데 아무 말도 듣지 못하면 도통 알아듣지 못한대! 입력 창이 뜨면 값을 써 넣고 확인을 눌러볼까? 🐍',
+    tip: '<pre>name = input("이름을 입력하세요: ")\n      ↑ 실행하면 이런 입력 창이 떠요!\n        창에 값을 쓰고 확인을 누르면 다음으로 진행해요</pre>' };
+}
+function RECUR(L) {
+  return { emoji: '🔄', title: '무한 부름 조심!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, 함수가 멈추는 약속 없이 자기 자신을 계속 부르면 언제 끝날지 몰라서 도통 알아듣지 못한대! '멈추는 조건(if)'을 먼저 검사하도록 적어볼까? 🐍",
+    tip: '<pre>def countdown(n):\n    if n == 0:        ← 1) 멈추는 조건을 먼저 검사!\n        return\n    print(n)\n    countdown(n - 1)  ← 2) 그다음 자기 자신을 다시 부름</pre>' };
+}
+function BREAKCONT(L) {
+  return { emoji: '🛑', title: '반복문 안에서만 쓸 수 있어요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, break와 continue는 for나 while 반복문 안에서만 쓸 수 있어서 밖에 있으면 도통 알아듣지 못한대! 반복문 안으로 들여 적어볼까? 🐍',
+    tip: '<pre>for i in range(5):    ← 반복문 안에 넣으려면\n    if i == 3:\n        break         ← O! 들여쓰기로 안쪽에 넣기\n\nbreak                 ← X! 반복문 밖에 있으면 안 돼요</pre>' };
+}
+function RETURNOUT(L) {
+  return { emoji: '📤', title: '함수 안에서만 돌려줄 수 있어요!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, return은 def로 만든 함수 안에서만 결과를 돌려줄 수 있어서 밖에 있으면 도통 알아듣지 못한대! 함수 안으로 들여 적어볼까? 🐍',
+    tip: '<pre>def add(a, b):\n    return a + b   ← O! def 안(들여쓰기)에서 사용\n\nreturn a + b       ← X! 함수 밖에 있으면 안 돼요\n\nprint(add(3, 4))   ← 돌려받은 값은 이렇게 밖에서 사용!</pre>' };
+}
+function GENERIC(L) {
+  return { emoji: '🤔', title: '파이썬 친구가 잠깐 헷갈렸어요',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, ' + L + ' 근처의 코드가 마음에 들지 않으면 도통 알아듣지 못한대! 친구는 화난 게 아니라 알려주고 싶을 뿐이에요 — ' + L + '을 천천히 다시 읽어 적어볼까? 그래도 어렵다면 선생님께 도움을 요청해요. 🐍',
+    tip: '<pre>① 줄 끝 콜론(:)   — if, elif, else, for, while, def 줄은 콜론 필수!\n② 들여쓰기        — 블록 안 명령은 스페이스 4칸, 탭·스페이스 섞지 않기\n③ 따옴표 짝꿍     — "글자" 앞뒤로 빠짐없이 감싸기\n④ 괄호 짝꿍       — ( ), [ ] 열고 닫은 개수 세기\n⑤ 철자·대소문자   — print, range, True 등 정확히!\n⑥ 변수 만들기     — 쓰기 전에 name = 값 으로 먼저 만들기</pre>' };
+}
+
+function ATTRMSG(h) {
+  return { emoji: '🧰', title: '그 자료형에는 없는 기능!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, .' + (h.found || '그 기능') + ' 기능은 그 자료형에는 없어서 도통 알아듣지 못한대! ' + (h.suggest ? "혹시 ." + h.suggest + "를 쓰려던 거라면 철자를 바로잡아 적어볼까? 🐍" : "자료형이 문자열인지 리스트인지 확인하고 올바른 기능 이름으로 적어볼까? 🐍"),
+    tip: '<pre>nums = [1, 2, 3]\nnums.upper()    ← X! upper는 글자(문자열) 기능이에요\nword = "안녕"\nword.upper()    ← O! 글자에 쓰면 OK\nnums.append(4)  ← O! 리스트에는 append 같은 기능 사용</pre>' };
+}
+function MODMSG(h) {
+  return { emoji: '📦', title: '없는 도구 상자(모듈)!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, '" + (h.found || '그 모듈') + "'이라는 도구 상자(모듈)가 어디에도 없어서 도통 알아듣지 못한대! 철자를 확인하고 import를 다시 적어볼까? 🐍",
+    tip: '<pre>import random         ← O! 도구 상자 이름 철자 확인\nimport randome        ← X! 철자가 틀리면 없는 상자예요\nrandom.randint(1, 6)  ← 상자 안 기능은 상자이름.기능()으로!</pre>' };
+}
+
+function PRINT_PAREN(L) {
+  return { emoji: '📣', title: 'print에는 괄호가 필수!',
+    msg: '앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, print 뒤에 ( ) 괄호가 빠지면 무엇을 말해야 할지 도통 알아듣지 못한대! 출력할 내용을 괄호 ( ) 로 감싸 적어볼까? 🐍',
+    tip: '<pre>print "안녕"     ← X! 파이썬 3에서는 괄호가 필수예요\nprint("안녕")    ← O! 괄호 안에 출력할 것을 쏙!</pre>' };
+}
+function EQ_ASSIGN(L) {
+  return { emoji: '⚖️', title: '같다(==)와 담는다(=)!',
+    msg: "앗! 파이썬 컴퓨터 친구는 아주 깐깐하고 꼼꼼해서, '둘이 같은가?'를 물어볼 땐 ==(등호 두 개)를 써야 하는데 =(하나)를 쓰면 값을 상자에 담으려다 도통 알아듣지 못한대! 조건을 비교할 땐 ==로 바꾸어 적어볼까? 🐍",
+    tip: '<pre>score = 90         ← 값을 상자에 담을 땐 =(하나)\nif score == 90:    ← 둘이 같은지 비교할 땐 ==(두 개)!</pre>' };
+}
+
+function buildFriendly(err) {
+  const L = err.line ? (err.line + '번째 줄') : '코드 속 어딘가';
+  const msg = (err.msg || '').toLowerCase();
+  const type = err.type || '';
+  const text = (err.text || '').trim();
+  const head = text.split('#')[0].trim();
+
+  if (msg.indexOf("missing parentheses in call to 'print'") !== -1) return PRINT_PAREN(L);
+  if (msg.indexOf("expected ':'") !== -1) return COLON(L);
+  if (msg.indexOf('invalid syntax') !== -1) {
+    // 조건식 안에서 비교(==) 대신 대입(=) 한 개를 쓴 경우 (>=, <=, != 는 제외)
+    if (/^(if|elif|while)\b/.test(head) && /[^=!<>]=[^=]/.test(head)) return EQ_ASSIGN(L);
+    if (/^(if|elif|else)\b/.test(head) && head.indexOf(':') === -1) return COLON(L);
+    if (/^(else|elif)\b/.test(head)) return ELSE_ALONE(L);
+    if (/^(for|while|def)\b/.test(head) && head.indexOf(':') === -1) return COLON(L);
+  }
+  if (err.hint) {
+    const h = err.hint;
+    if (h.kind === 'attr') return ATTRMSG(h);
+    if (h.kind === 'module') return MODMSG(h);
+    if (h.suggest === 'True' || h.suggest === 'False') return BOOL(h);
+    if (h.found.toLowerCase() === h.suggest.toLowerCase()) return CASE(h);
+    return TYPO(h);
+  }
+  if (msg.indexOf('expected an indented block') !== -1) {
+    const m = (err.msg || '').match(/after '(\w+)'/);
+    return NEED_INDENT(m ? m[1] : 'if', L);
+  }
+  if (msg.indexOf('unexpected indent') !== -1) return BAD_INDENT(L);
+  if (type === 'TabError' || msg.indexOf('unindent does not match') !== -1) return STAIRS(L);
+  if (msg.indexOf('eol while scanning string') !== -1 || msg.indexOf('unterminated string') !== -1 || msg.indexOf('f-string') !== -1) return QUOTES(L);
+  if (msg.indexOf('unmatched') !== -1) return PAREN(L);
+  if (msg.indexOf('cannot assign to') !== -1 || msg.indexOf("can't assign to") !== -1) return ASSIGN();
+  if (msg.indexOf('invalid character') !== -1) return SYMBOL();
+  if (type === 'NameError') return NAME(err.name || '그 이름', L);
+  if (type === 'TypeError') {
+    if (msg.indexOf('can only concatenate') !== -1) return STRCONCAT(L);
+    if (msg.indexOf('not supported between') !== -1) {
+      if (msg.indexOf("'str' and 'str'") !== -1) return COMPARE_STR();
+      return COMPARE(L);
+    }
+    if (msg.indexOf('unsupported operand') !== -1) return UNSUPPORTED(L);
+    if (msg.indexOf("can't multiply sequence") !== -1) return MULSEQ(L);
+    if (msg.indexOf('is not callable') !== -1) return NOTCALL(L);
+    if (msg.indexOf('list indices') !== -1) return LISTIDX(L);
+    return GENERIC(L);
+  }
+  if (type === 'IndexError') return IDXERR(L);
+  if (type === 'KeyError') return KEYERR(((err.msg || '').match(/'([^']+)'/) || ['', '그 열쇠'])[1], L);
+  if (type === 'AttributeError') return ATTRMSG(err.hint || {});
+  if (type === 'ModuleNotFoundError' || type === 'ImportError') return MODMSG(err.hint || {});
+  if (type === 'ValueError') return INTCONV(((err.msg || '').match(/'([^']+)'/) || ['', ''])[1], L);
+  if (type === 'ZeroDivisionError') return DIV0(L);
+  if (type === 'EOFError') return EOF(L);
+  if (type === 'RecursionError') return RECUR(L);
+  if (msg.indexOf('outside loop') !== -1 || msg.indexOf('not properly in loop') !== -1) return BREAKCONT(L);
+  if (msg.indexOf('outside function') !== -1) return RETURNOUT(L);
+  return GENERIC(L);
+}
+
+init();
+</script>
+</body>
+</html>

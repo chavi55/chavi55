@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>퀴즈 라이브! - 참가자</title>
+<link rel="icon" href="data:,">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    color: #fff; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(160deg, #5b21a8, #31106e);
+    display: flex; flex-direction: column; user-select: none; touch-action: manipulation;
+  }
+  .hidden { display: none !important; }
+
+  /* 입장 화면 */
+  #join { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .join-card { width: 100%; max-width: 420px; text-align: center; }
+  .join-card h1 { font-size: 40px; letter-spacing: 2px; margin-bottom: 6px; }
+  .join-card .sub { color: rgba(255,255,255,.7); margin-bottom: 30px; }
+  .fld { margin-bottom: 14px; text-align: left; }
+  .fld label { display: block; font-size: 14px; color: rgba(255,255,255,.75); margin-bottom: 6px; font-weight: 700; }
+  .fld input {
+    width: 100%; font-size: 22px; padding: 14px 16px; border-radius: 10px; border: none;
+    background: #fff; color: #222; font-family: inherit;
+  }
+  #join-btn {
+    width: 100%; margin-top: 10px; padding: 16px; font-size: 22px; font-weight: 800;
+    background: #26890c; color: #fff; border: none; border-radius: 10px; cursor: pointer;
+  }
+  #join-err { color: #ff8a8a; font-size: 15px; min-height: 22px; margin-top: 12px; font-weight: 700; }
+  #join-wait { color: rgba(255,255,255,.75); font-size: 15px; margin-top: 12px; }
+
+  /* 게임 화면 */
+  #game { flex: 1; display: flex; flex-direction: column; padding: 18px 16px 24px; max-width: 640px;
+          width: 100%; margin: 0 auto; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; font-size: 15px;
+            color: rgba(255,255,255,.8); margin-bottom: 14px; min-height: 24px; }
+  .topbar b { color: #ffd166; }
+  .me { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; gap: 12px; }
+  .big { font-size: 30px; font-weight: 800; line-height: 1.35; }
+  .mid { font-size: 19px; color: rgba(255,255,255,.85); line-height: 1.6; }
+  .spin { width: 54px; height: 54px; border-radius: 50%; border: 5px solid rgba(255,255,255,.2);
+          border-top-color: #ffd166; animation: sp 1s linear infinite; margin-bottom: 8px; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1; min-height: 0; }
+  .ans {
+    border: none; border-radius: 14px; color: #fff; font-family: inherit;
+    font-size: clamp(16px, 4.5vw, 22px); font-weight: 700; padding: 12px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .08s, filter .1s; min-height: 120px;
+  }
+  .ans .shape { font-size: clamp(24px, 7vw, 34px); }
+  .ans:active { transform: scale(.97); }
+  .ans.c0 { background: #e21b3c; } .ans.c1 { background: #1368ce; }
+  .ans.c2 { background: #d89e00; } .ans.c3 { background: #26890c; }
+  .ans.picked { outline: 4px solid #fff; filter: brightness(.8); pointer-events: none; }
+  .ans.locked { pointer-events: none; filter: brightness(.55); }
+  .ans.locked.picked { filter: brightness(.9); }
+
+  .result-tag { font-size: 26px; font-weight: 800; }
+  .result-tag.ok { color: #7dff8a; } .result-tag.no { color: #ff8a8a; }
+  .gained { font-size: 20px; color: #ffd166; font-weight: 700; }
+  .medal { font-size: 64px; font-weight: 800; color: #ffd166; }
+</style>
+</head>
+<body>
+
+<div id="join">
+  <div class="join-card">
+    <h1>퀴즈 라이브!</h1>
+    <div class="sub">닉네임을 입력하고 입장하세요</div>
+    <div class="fld"><label>게임 PIN</label><input id="f-pin" inputmode="numeric" placeholder="000000"></div>
+    <div class="fld"><label>닉네임</label><input id="f-name" maxlength="12" placeholder="예: 철수"></div>
+    <button id="join-btn">입장</button>
+    <div id="join-err"></div>
+    <div id="join-wait"></div>
+  </div>
+</div>
+
+<div id="game" class="hidden">
+  <div class="topbar"><span id="t-left"></span><span id="t-prog"></span></div>
+
+  <div class="me" id="g-lobby">
+    <div class="spin"></div>
+    <div class="big">입장 완료!</div>
+    <div class="mid">진행자가 게임을 시작할 때까지 기다려 주세요<br>현재 참가자 <b id="lob-cnt">0</b>명</div>
+  </div>
+
+  <div class="me hidden" id="g-question">
+    <div class="mid" id="q-hint">답을 골라 눌러 주세요!</div>
+    <div class="grid4" id="q-grid"></div>
+  </div>
+
+  <div class="me hidden" id="g-wait">
+    <div class="spin"></div>
+    <div class="big">답 제출 완료!</div>
+    <div class="mid">다른 참가자를 기다리는 중…</div>
+  </div>
+
+  <div class="me hidden" id="g-reveal">
+    <div class="result-tag" id="rv-tag"></div>
+    <div class="gained" id="rv-gained"></div>
+    <div class="mid" id="rv-score"></div>
+  </div>
+
+  <div class="me hidden" id="g-score">
+    <div class="medal" id="sc-rank"></div>
+    <div class="big" id="sc-line"></div>
+    <div class="mid">다음 문제를 기다리는 중…</div>
+  </div>
+
+  <div class="me hidden" id="g-final">
+    <div class="medal" id="fi-rank"></div>
+    <div class="big" id="fi-line"></div>
+    <div class="mid">진행자 화면에서 전체 결과를 확인하세요</div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const SHAPES = ['▲', '◆', '●', '■'];
+let name = sessionStorage.getItem('quizName') || '';
+let phase = '';
+
+async function api(url, body) {
+  const r = await fetch(url, body ? {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  } : undefined);
+  return r.json();
+}
+
+/* --- 입장 --- */
+async function prefill() {
+  try {
+    const d = await api('/api/info');
+    if (d.pin) $('f-pin').value = d.pin;
+    else $('join-wait').textContent = '진행자가 게임을 준비하는 중입니다… 잠시 후 PIN이 자동 입력됩니다.';
+    if (name) $('f-name').value = name;
+  } catch (e) { $('join-wait').textContent = '서버에 연결할 수 없습니다. 잠시 후 다시 시도합니다.'; }
+}
+
+$('join-btn').onclick = doJoin;
+$('f-name').addEventListener('keydown', e => { if (e.key === 'Enter') doJoin(); });
+$('f-pin').addEventListener('keydown', e => { if (e.key === 'Enter') doJoin(); });
+
+async function doJoin() {
+  const pin = $('f-pin').value.trim();
+  const nm = $('f-name').value.trim();
+  if (!nm) { $('join-err').textContent = '닉네임을 입력해 주세요.'; return; }
+  try {
+    const d = await api('/api/join', { pin, name: nm });
+    if (!d.ok) { $('join-err').textContent = d.error || '입장할 수 없습니다.'; prefill(); return; }
+    name = nm; sessionStorage.setItem('quizName', nm);
+    $('join-err').textContent = '';
+    startGame();
+  } catch (e) { $('join-err').textContent = '서버에 연결할 수 없습니다.'; }
+}
+
+function startGame() {
+  $('join').classList.add('hidden');
+  $('game').classList.remove('hidden');
+  pollLoop();
+}
+
+/* --- 게임 --- */
+function buildGrid(choices, picked) {
+  const grid = $('q-grid'); grid.textContent = '';
+  choices.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'ans c' + i + (picked === i ? ' picked' : picked !== null && picked !== undefined ? ' locked' : '');
+    const sh = document.createElement('span'); sh.className = 'shape'; sh.textContent = SHAPES[i];
+    const tx = document.createElement('span'); tx.textContent = c;
+    b.append(sh, tx);
+    b.onclick = () => pick(i);
+    grid.append(b);
+  });
+}
+
+async function pick(i) {
+  buildGrid(currentChoices, i);
+  try {
+    const d = await api('/api/answer', { name, choice: i });
+    if (!d.ok && d.error) { const t = $('t-left'); t.textContent = d.error; }
+  } catch (e) {}
+}
+
+let currentChoices = [];
+
+function view(id) {
+  ['g-lobby', 'g-question', 'g-wait', 'g-reveal', 'g-score', 'g-final']
+    .forEach(x => $(x).classList.toggle('hidden', x !== id));
+}
+
+function rankBadge(r) {
+  if (r === 1) return '1위';
+  if (r === 2) return '2위';
+  if (r === 3) return '3위';
+  return r + '위';
+}
+
+function render(d) {
+  if (!d.joined) { // 세션 만료/강제퇴장 → 다시 입장
+    name = ''; sessionStorage.removeItem('quizName');
+    $('game').classList.add('hidden');
+    $('join').classList.remove('hidden');
+    $('join-err').textContent = '게임에서 나가게 되었습니다. 다시 입장해 주세요.';
+    prefill();
+    return;
+  }
+  $('t-prog').textContent = d.q_total ? ('문제 ' + d.q_index + ' / ' + d.q_total) : '';
+  $('t-left').textContent = d.phase === 'question' ? ('남은 시간 ' + d.time_left + '초') : '';
+
+  if (d.phase !== phase) phase = d.phase;
+
+  if (d.phase === 'lobby') {
+    view('g-lobby');
+    $('lob-cnt').textContent = d.players_count;
+  } else if (d.phase === 'question') {
+    if (d.my.answered) { view('g-wait'); }
+    else {
+      view('g-question');
+      if (JSON.stringify(d.choices) !== JSON.stringify(currentChoices)) {
+        currentChoices = d.choices || [];
+        buildGrid(currentChoices, null);
+        $('q-hint').textContent = '답을 골라 눌러 주세요!';
+      }
+    }
+  } else if (d.phase === 'reveal') {
+    view('g-reveal');
+    if (d.my.answered && d.my.correct) {
+      $('rv-tag').textContent = '정답입니다!'; $('rv-tag').className = 'result-tag ok';
+      $('rv-gained').textContent = '+' + d.my.gained + '점';
+    } else if (d.my.answered) {
+      $('rv-tag').textContent = '아쉽네요…'; $('rv-tag').className = 'result-tag no';
+      $('rv-gained').textContent = '정답: ' + SHAPES[d.my.answer] + ' ' + (currentChoices[d.my.answer] || '');
+    } else {
+      $('rv-tag').textContent = '응답하지 않았어요'; $('rv-tag').className = 'result-tag no';
+      $('rv-gained').textContent = '';
+    }
+    $('rv-score').textContent = '현재 ' + d.my.score + '점 · ' + rankBadge(d.my.rank || 0);
+  } else if (d.phase === 'scoreboard') {
+    view('g-score');
+    $('sc-rank').textContent = rankBadge(d.my.rank || 0);
+    $('sc-line').textContent = d.my.score + '점';
+  } else if (d.phase === 'final') {
+    view('g-final');
+    const r = d.my.rank || 0;
+    $('fi-rank').textContent = rankBadge(r);
+    $('fi-line').textContent = '최종 ' + d.my.score + '점';
+    if (r === 1) $('fi-line').textContent = '우승! 최종 ' + d.my.score + '점';
+  }
+}
+
+async function pollOnce() {
+  try {
+    const d = await api('/api/play?name=' + encodeURIComponent(name));
+    if (d && typeof d === 'object') render(d);
+  } catch (e) {}
+}
+
+function pollLoop() { pollOnce(); setInterval(pollOnce, 800); }
+
+prefill();
+if (name) { // 새로고침해도 자동 복귀 시도
+  $('f-name').value = name;
+}
+</script>
+</body>
+</html>
